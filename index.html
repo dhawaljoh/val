@@ -95,6 +95,7 @@
 
     #noBtn {
       left: 62%;
+      top: 60px;        /* fixed starting position */
       background: #e5e7eb;
       color: #111827;
     }
@@ -209,6 +210,15 @@
       confettiCanvas.style.height = "100vh";
     }
 
+    function handleMove(x, y) {
+      const b = noBtn.getBoundingClientRect();
+      const d = Math.hypot(
+      (b.left + b.width / 2) - x,
+      (b.top + b.height / 2) - y
+      );
+      if (d < 140) moveNo(x, y);
+    }
+    
     resizeConfettiCanvas();
     window.addEventListener("resize", resizeConfettiCanvas);
     window.addEventListener("orientationchange", () => setTimeout(resizeConfettiCanvas, 150));
@@ -278,16 +288,33 @@
       growYes();
     }
 
+    // zone.addEventListener("pointermove", e => {
+    //   const b = noBtn.getBoundingClientRect();
+    //   const d = Math.hypot(
+    //     (b.left + b.width / 2) - e.clientX,
+    //     (b.top + b.height / 2) - e.clientY
+    //   );
+    //   if (d < 140) moveNo(e.clientX, e.clientY);
+    // });
+    
     zone.addEventListener("pointermove", e => {
-      const b = noBtn.getBoundingClientRect();
-      const d = Math.hypot(
-        (b.left + b.width / 2) - e.clientX,
-        (b.top + b.height / 2) - e.clientY
-      );
-      if (d < 140) moveNo(e.clientX, e.clientY);
+      handleMove(e.clientX, e.clientY);
     });
 
-    noBtn.addEventListener("click", e => e.preventDefault());
+    // noBtn.addEventListener("click", e => e.preventDefault());
+    ["click", "touchstart"].forEach(evt => {
+      noBtn.addEventListener(evt, e => e.preventDefault());
+    });
+
+    zone.addEventListener("touchstart", e => {
+      const t = e.touches[0];
+      handleMove(t.clientX, t.clientY);
+    }, { passive: true });
+
+    zone.addEventListener("touchmove", e => {
+      const t = e.touches[0];
+      handleMove(t.clientX, t.clientY);
+    }, { passive: true });
 
     /* ---------- YES CLICK ---------- */
     yesBtn.addEventListener("click", () => {
@@ -300,6 +327,7 @@
   </script>
 </body>
 </html>
+
 
 
 
